@@ -1,3 +1,5 @@
+﻿import fs from "fs/promises";
+import path from "path";
 import Document, { DOCUMENT_CATEGORIES } from "../models/Document.js";
 
 export async function getDocuments(req, res) {
@@ -37,4 +39,22 @@ export async function createDocument(req, res) {
 
   const populated = await document.populate("uploadedBy", "name department");
   res.status(201).json({ document: populated });
+}
+
+export async function deleteDocument(req, res) {
+  const document = await Document.findById(req.params.id);
+  if (!document) {
+    return res.status(404).json({ message: "ไม่พบเอกสารที่ต้องการลบ" });
+  }
+
+  const filename = document.fileUrl?.split("/uploads/")[1];
+  if (filename) {
+    const filePath = path.resolve("uploads", filename);
+    await fs.unlink(filePath).catch((error) => {
+      if (error.code !== "ENOENT") throw error;
+    });
+  }
+
+  await document.deleteOne();
+  res.json({ message: "ลบเอกสารเรียบร้อยแล้ว" });
 }

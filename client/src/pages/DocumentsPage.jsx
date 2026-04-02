@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+﻿import { useEffect, useMemo, useState } from "react";
 import Card from "../components/ui/Card";
 import DataTable from "../components/ui/DataTable";
 import ResponsiveModal from "../components/ui/ResponsiveModal";
@@ -29,6 +29,7 @@ export default function DocumentsPage() {
   const [file, setFile] = useState(null);
   const [form, setForm] = useState({ name: "", category: "" });
   const [submitError, setSubmitError] = useState("");
+  const [deletingId, setDeletingId] = useState("");
 
   useEffect(() => {
     const loadDocuments = async () => {
@@ -66,6 +67,55 @@ export default function DocumentsPage() {
     }
   };
 
+  const handleDelete = async (documentId) => {
+    const confirmed = window.confirm("ต้องการลบเอกสารนี้ใช่หรือไม่?");
+    if (!confirmed) return;
+
+    try {
+      setDeletingId(documentId);
+      setSubmitError("");
+      await api.delete(`/documents/${documentId}`);
+      setData((data || []).filter((item) => item._id !== documentId));
+    } catch (err) {
+      setSubmitError(err.message);
+    } finally {
+      setDeletingId("");
+    }
+  };
+
+  const columns = [
+    { key: "name", label: "ชื่อเอกสาร" },
+    { key: "category", label: "หมวดหมู่" },
+    { key: "uploadedBy", label: "อัปโหลดโดย", render: (row) => row.uploadedBy?.name || "-" },
+    { key: "createdAt", label: "วันที่", render: (row) => formatDate(row.createdAt) },
+    {
+      key: "fileUrl",
+      label: "ไฟล์",
+      render: (row) => (
+        <a href={row.fileUrl} target="_blank" rel="noreferrer" className="font-medium text-brand-600">
+          เปิดเอกสาร
+        </a>
+      )
+    }
+  ];
+
+  if (user?.role === "admin") {
+    columns.push({
+      key: "actions",
+      label: "จัดการ",
+      render: (row) => (
+        <button
+          type="button"
+          onClick={() => handleDelete(row._id)}
+          disabled={deletingId === row._id}
+          className="rounded-xl bg-red-50 px-3 py-2 text-sm font-medium text-red-600 transition hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-60"
+        >
+          {deletingId === row._id ? "กำลังลบ..." : "ลบ"}
+        </button>
+      )
+    });
+  }
+
   return (
     <Card
       title="เอกสารภายใน"
@@ -80,27 +130,8 @@ export default function DocumentsPage() {
     >
       {loading && <p className="text-sm text-slate-500">กำลังโหลดเอกสาร...</p>}
       {error && <p className="rounded-2xl bg-red-50 p-4 text-sm text-red-600">{error}</p>}
-      {!loading && !error && (
-        <DataTable
-          columns={[
-            { key: "name", label: "ชื่อเอกสาร" },
-            { key: "category", label: "หมวดหมู่" },
-            { key: "uploadedBy", label: "อัปโหลดโดย", render: (row) => row.uploadedBy?.name || "-" },
-            { key: "createdAt", label: "วันที่", render: (row) => formatDate(row.createdAt) },
-            {
-              key: "fileUrl",
-              label: "ไฟล์",
-              render: (row) => (
-                <a href={row.fileUrl} target="_blank" rel="noreferrer" className="font-medium text-brand-600">
-                  เปิดเอกสาร
-                </a>
-              )
-            }
-          ]}
-          rows={filtered}
-          emptyMessage="ยังไม่มีเอกสารในระบบ"
-        />
-      )}
+      {submitError && <p className="mb-4 rounded-2xl bg-red-50 p-4 text-sm text-red-600">{submitError}</p>}
+      {!loading && !error && <DataTable columns={columns} rows={filtered} emptyMessage="ยังไม่มีเอกสารในระบบ" />}
 
       <ResponsiveModal open={open} title="อัปโหลดเอกสารใหม่" onClose={() => setOpen(false)}>
         <form onSubmit={handleUpload} className="space-y-4">
@@ -122,7 +153,6 @@ export default function DocumentsPage() {
             </select>
           </label>
           <FileUpload label="ไฟล์เอกสาร" accept=".pdf,image/*" onChange={setFile} />
-          {submitError && <p className="rounded-2xl bg-red-50 p-3 text-sm text-red-600">{submitError}</p>}
           <button className="rounded-2xl bg-brand-600 px-5 py-3 text-sm font-medium text-white">บันทึกเอกสาร</button>
         </form>
       </ResponsiveModal>
