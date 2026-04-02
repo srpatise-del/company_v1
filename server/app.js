@@ -34,6 +34,7 @@ app.use("/api/projects", projectRoutes);
 app.use("/api/notifications", notificationRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/users", userRoutes);
+app.get('/api/health', (req, res) => res.json({ status: 'ok' }));
 
 app.use(notFound);
 app.use(errorHandler);
