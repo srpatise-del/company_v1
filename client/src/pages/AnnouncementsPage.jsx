@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+﻿import { useMemo, useState } from "react";
 import Card from "../components/ui/Card";
 import Modal from "../components/ui/Modal";
 import FormInput from "../components/ui/FormInput";
@@ -9,6 +9,7 @@ import { useSearch } from "../context/SearchContext";
 import { useAuth } from "../context/AuthContext";
 import { formatDate } from "../utils/format";
 
+const announcementCategories = ["ประกาศอย่างเป็นทางการ", "ประกาศอย่างไม่เป็นทางการ"];
 const initialForm = { title: "", content: "", category: "", isPinned: false };
 
 export default function AnnouncementsPage() {
@@ -76,7 +77,22 @@ export default function AnnouncementsPage() {
       <Modal open={open} title="สร้างประกาศใหม่" onClose={() => setOpen(false)}>
         <form onSubmit={handleCreate} className="space-y-4">
           <FormInput label="หัวข้อประกาศ" value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} required />
-          <FormInput label="หมวดหมู่" value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} required />
+          <label className="block">
+            <span className="mb-2 block text-sm font-medium text-slate-700">หมวดหมู่</span>
+            <select
+              value={form.category}
+              onChange={(e) => setForm({ ...form, category: e.target.value })}
+              className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-brand-500 focus:ring-4 focus:ring-brand-100"
+              required
+            >
+              <option value="">เลือกหมวดหมู่ประกาศ</option>
+              {announcementCategories.map((category) => (
+                <option key={category} value={category}>
+                  {category}
+                </option>
+              ))}
+            </select>
+          </label>
           <label className="block">
             <span className="mb-2 block text-sm font-medium text-slate-700">รายละเอียด</span>
             <textarea
