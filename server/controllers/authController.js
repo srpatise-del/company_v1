@@ -1,4 +1,4 @@
-import bcrypt from "bcryptjs";
+﻿import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import User from "../models/User.js";
 
@@ -7,7 +7,7 @@ function generateToken(id) {
 }
 
 export async function register(req, res) {
-  const { name, email, password, role, department } = req.body;
+  const { name, email, password, department } = req.body;
   const existingUser = await User.findOne({ email });
   if (existingUser) return res.status(400).json({ message: "อีเมลนี้ถูกใช้งานแล้ว" });
 
@@ -16,7 +16,7 @@ export async function register(req, res) {
     name,
     email,
     password: hashedPassword,
-    role: role || "employee",
+    role: "employee",
     department
   });
 

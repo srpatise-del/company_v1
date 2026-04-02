@@ -21,8 +21,7 @@ export default function RegisterPage() {
     name: "",
     email: "",
     password: "",
-    department: "",
-    role: "employee"
+    department: ""
   });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -81,17 +80,6 @@ export default function RegisterPage() {
             onChange={(e) => setForm({ ...form, password: e.target.value })}
             required
           />
-          <label className="block md:col-span-2">
-            <span className="mb-2 block text-sm font-medium text-slate-700">สิทธิ์ผู้ใช้</span>
-            <select
-              value={form.role}
-              onChange={(e) => setForm({ ...form, role: e.target.value })}
-              className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-brand-500 focus:ring-4 focus:ring-brand-100"
-            >
-              <option value="employee">พนักงาน</option>
-              <option value="admin">ผู้ดูแลระบบ</option>
-            </select>
-          </label>
           {error && <p className="rounded-2xl bg-red-50 px-4 py-3 text-sm text-red-600 md:col-span-2">{error}</p>}
           <button disabled={loading} className="rounded-2xl bg-brand-600 px-4 py-3 font-medium text-white md:col-span-2">
             {loading ? "กำลังสร้างบัญชี..." : "สมัครสมาชิก"}
