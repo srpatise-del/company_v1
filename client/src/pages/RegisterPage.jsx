@@ -1,8 +1,18 @@
-import { useState } from "react";
+﻿import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import api from "../services/api";
 import { useAuth } from "../context/AuthContext";
 import FormInput from "../components/ui/FormInput";
+
+const DEPARTMENTS = [
+  "ฝ่ายบริหาร",
+  "แผนกทรัพยากรบุคคล",
+  "แผนกการเงินและบัญชี",
+  "แผนกการตลาด",
+  "แผนกฝ่ายขาย",
+  "แผนกไอที",
+  "แผนกฝ่ายปฏิบัติการ"
+];
 
 export default function RegisterPage() {
   const navigate = useNavigate();
@@ -39,8 +49,30 @@ export default function RegisterPage() {
         <p className="mt-2 text-sm text-slate-500">สร้างบัญชีเพื่อเริ่มใช้งานระบบภายในบริษัท</p>
         <form onSubmit={handleSubmit} className="mt-8 grid gap-4 md:grid-cols-2">
           <FormInput label="ชื่อ - นามสกุล" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required />
-          <FormInput label="แผนก" value={form.department} onChange={(e) => setForm({ ...form, department: e.target.value })} required />
-          <FormInput label="อีเมล" type="email" className="md:col-span-2" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} required />
+          <label className="block">
+            <span className="mb-2 block text-sm font-medium text-slate-700">แผนก</span>
+            <select
+              value={form.department}
+              onChange={(e) => setForm({ ...form, department: e.target.value })}
+              className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-brand-500 focus:ring-4 focus:ring-brand-100"
+              required
+            >
+              <option value="">เลือกแผนก</option>
+              {DEPARTMENTS.map((department) => (
+                <option key={department} value={department}>
+                  {department}
+                </option>
+              ))}
+            </select>
+          </label>
+          <FormInput
+            label="อีเมล"
+            type="email"
+            className="md:col-span-2"
+            value={form.email}
+            onChange={(e) => setForm({ ...form, email: e.target.value })}
+            required
+          />
           <FormInput
             label="รหัสผ่าน"
             type="password"
